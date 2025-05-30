@@ -2,7 +2,7 @@ import json
 import sys
 
 # NOTE: This comparison script is primarily designed for the EXPLAIN JSON structure 
-# encountered in the CI check (e.g., for TPCH Q21). 
+# encountered in the CI check (e.g., for TPCH_TINY Q21). 
 # For more complex EXPLAIN outputs involving UNIONs, complicated subqueries, 
 # or views, its coverage and accuracy might be limited and may require enhancements.
 
