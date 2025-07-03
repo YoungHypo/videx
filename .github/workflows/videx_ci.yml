@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'src/**'
+      - 'scripts/**'
       - 'build/**'
       - 'pyproject.toml'
       - 'requirements.txt'
@@ -12,6 +13,7 @@ on:
     branches: [main]
     paths:
       - 'src/**'
+      - 'scripts/**'
       - 'build/**'
       - 'pyproject.toml'
       - 'requirements.txt'
@@ -175,7 +177,7 @@ jobs:
       # Step 5: Verify EXPLAIN JSON Structure
       - name: Compare EXPLAIN JSON
         run: |
-          python build/compare_explain_json.py explain_innodb_ci.json explain_videx_ci.json
+          python scripts/compare_explain_json.py explain_innodb_ci.json explain_videx_ci.json
         working-directory: videx_server
 
       # Cleanup

@@ -48,10 +48,10 @@ This method will compile a complete MySQL Server with the VIDEX engine included.
 
 ```bash
 # Build
-cd $VIDEX_HOME/build && bash build.sh
+cd $VIDEX_HOME && bash scripts/build.sh
 ```
 
-> Note: You can customize the following in `build/config.sh`:
+> Note: You can customize the following in `scripts/config.sh`:
 > - VIDEX/MySQL repository locations
 > - MySQL/VIDEX service ports
 > - Other configuration options
@@ -67,7 +67,7 @@ Users can compile just the videx plugin and install it on a running mysql-server
 
 ### 3.1 Compile Plugin
 ```bash
-cd $VIDEX_HOME/build && bash build_videx.sh
+cd $VIDEX_HOME && bash scripts/build_videx.sh
 ```
 The plugin file `ha_videx.so` will be generated in `mysql_build_output/build/plugin_output_directory/`
 
@@ -107,12 +107,12 @@ If you compiled a complete MySQL Server (Installation Method 1), you can use scr
 
 1. Initialize service:
 ```bash
-cd $VIDEX_HOME/build && bash init_server.sh
+cd $VIDEX_HOME && bash scripts/init_server.sh
 ```
 
 2. Start service:
 ```bash
-cd $VIDEX_HOME/build && bash start_server.sh
+cd $VIDEX_HOME && bash scripts/start_server.sh
 ```
 
 ### 4.2 Start VIDEX Server Independently

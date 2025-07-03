@@ -47,10 +47,10 @@ VIDEX 依赖以下组件：
 
 ```bash
 # 编译
-cd $VIDEX_HOME/build && bash build.sh
+cd $VIDEX_HOME && bash scripts/build.sh
 ```
 
-> 注：可通过修改 `build/config.sh` 自定义：
+> 注：可通过修改 `scripts/config.sh` 自定义：
 > - VIDEX/MySQL 代码仓库位置
 > - MySQL/VIDEX 服务端口
 > - 其他配置项
@@ -67,7 +67,7 @@ cd $VIDEX_HOME/build && bash build.sh
 
 ### 3.1 编译插件
 ```bash
-cd $VIDEX_HOME/build && bash build_videx.sh
+cd $VIDEX_HOME && bash scripts/build_videx.sh
 ```
 插件文件 `ha_videx.so` 将生成在 `mysql_build_output/build/plugin_output_directory/`
 
@@ -107,12 +107,12 @@ SHOW ENGINES;  -- VIDEX 应出现在引擎列表中
 
 1. 初始化服务：
 ```bash
-cd $VIDEX_HOME/build && bash init_server.sh
+cd $VIDEX_HOME && bash scripts/init_server.sh
 ```
 
 2. 启动服务：
 ```bash
-cd $VIDEX_HOME/build && bash start_server.sh
+cd $VIDEX_HOME && bash scripts/start_server.sh
 ```
 
 ### 4.2 独立启动 VIDEX Server
