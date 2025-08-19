@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# === MySQL 连接信息 ===
+# === MySQL Connection Info ===
 HOST="127.0.0.1"
 PORT="13308"
 USER="videx"
 PASS="password"
-DB="videx_tpch_tiny"
+DB="tpch_tiny"
 
-# === 输出目录 ===
-OUTDIR="./outputs_videx"
+# === Output Directory ===
+OUTDIR="./outputs"
 mkdir -p "$OUTDIR"
 
-# --- Q01 ~ Q21/22/22_simple 定义（全部内联，安全 heredoc） ---
+# --- Q01 ~ Q21/22/22_simple Definition (All inline, safe heredoc) ---
 Q01=$(cat <<'SQL'
 SELECT l_returnflag, l_linestatus, sum(l_quantity) AS sum_qty , sum(l_extendedprice) AS sum_base_price , sum(l_extendedprice * (1 - l_discount)) AS sum_disc_price , sum(l_extendedprice * (1 - l_discount) * (1 + l_tax)) AS sum_charge , avg(l_quantity) AS avg_qty, avg(l_extendedprice) AS avg_price , avg(l_discount) AS avg_disc, count(*) AS count_order
 FROM lineitem
@@ -388,8 +388,7 @@ from (
 SQL
 )
 
-# ORDER=(Q01 Q02 Q03 Q04 Q05 Q06 Q07 Q08 Q09 Q10 Q11 Q12 Q13 Q14 Q16 Q17 Q18 Q19 Q20 Q21 Q22 Q22_simple)
-ORDER=(Q16 Q17 Q18 Q19 Q20 Q21 Q22 Q22_simple)
+ORDER=(Q01 Q02 Q03 Q04 Q05 Q06 Q07 Q08 Q09 Q10 Q11 Q12 Q13 Q14 Q16 Q17 Q18 Q19 Q20 Q21 Q22 Q22_simple)
 
 run_one() {
   local name="$1"
@@ -398,20 +397,20 @@ run_one() {
   mysql -h"$HOST" -P"$PORT" -u"$USER" -p"$PASS" --database="$DB" --raw <<SQL >/dev/null
 SET optimizer_trace="enabled=on", SESSION optimizer_trace_max_mem_size=4294967295;
 
-\T $OUTDIR/${name}.explain_videx.json
+\T $OUTDIR/${name}.explain.json
 EXPLAIN FORMAT=JSON ${sql}
 \t
 
-\T $OUTDIR/${name}.trace_videx.txt
+\T $OUTDIR/${name}.trace.txt
 SELECT trace FROM INFORMATION_SCHEMA.OPTIMIZER_TRACE\G
 \t
 
 QUIT
 SQL
-  echo "Done: $name -> $OUTDIR/${name}.explain_videx.json, $OUTDIR/${name}.trace_videx.txt"
+  echo "Done: $name -> $OUTDIR/${name}.explain.json, $OUTDIR/${name}.trace.txt"
 }
 
-# --- 执行 ---
+# --- Execute ---
 for key in "${ORDER[@]}"; do
   run_one "$key" "${!key}"
 done
