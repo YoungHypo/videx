@@ -1,5 +1,5 @@
 # MariaDB Build Environment
-FROM debian:sid AS builder
+FROM debian:bullseye AS builder
 
 # Metadata
 LABEL maintainer="Haibo Yang <haibo942us@gmail.com>"
@@ -20,7 +20,6 @@ RUN echo 'deb-src http://deb.debian.org/debian sid main' > /etc/apt/sources.list
     clang \
     entr \
     moreutils \
-    git \
     cmake \
     wget \
     ca-certificates \
@@ -77,7 +76,6 @@ RUN echo 'deb-src http://deb.debian.org/debian sid main' > /etc/apt/sources.list
     openssh-server \
     net-tools \
     rsync \
-    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Verify key build tools are installed
@@ -107,9 +105,8 @@ RUN mkdir -p /var/run/sshd && \
 
 # Application ports:
 # 13308 - MySQL service
-# 5001  - Videx service  
 # 1234  - GDB debug server
 # 22    - SSH service
-EXPOSE 13308 5001 1234 22
+EXPOSE 13308 1234 22
 
 CMD ["/etc/init.d/ssh", "start"]
