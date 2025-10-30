@@ -1,0 +1,100 @@
+MariaDB videx@127.0.0.1:ddw_test_src> EXPLAIN SELECT * FROM orders WHERE created_at = '2025-01-15 10:30:00';
++----+-------------+--------+------+----------------+----------------+---------+-------+------+-------+
+| id | select_type | table  | type | possible_keys  | key            | key_len | ref   | rows | Extra |
++----+-------------+--------+------+----------------+----------------+---------+-------+------+-------+
+| 1  | SIMPLE      | orders | ref  | idx_created_at | idx_created_at | 5       | const | 1    |       |
++----+-------------+--------+------+----------------+----------------+---------+-------+------+-------+
+1 row in set
+Time: 0.006s
+MariaDB videx@127.0.0.1:ddw_test_src> EXPLAIN SELECT * FROM orders 
+                                   -> WHERE created_at BETWEEN '2025-01-01 00:00:00' AND '2025-01-31 23:59:59';
++----+-------------+--------+-------+----------------+----------------+---------+--------+-------+-----------------------+
+| id | select_type | table  | type  | possible_keys  | key            | key_len | ref    | rows  | Extra                 |
++----+-------------+--------+-------+----------------+----------------+---------+--------+-------+-----------------------+
+| 1  | SIMPLE      | orders | range | idx_created_at | idx_created_at | 5       | <null> | 56868 | Using index condition |
++----+-------------+--------+-------+----------------+----------------+---------+--------+-------+-----------------------+
+1 row in set
+Time: 0.007s
+MariaDB videx@127.0.0.1:ddw_test_src> EXPLAIN SELECT * FROM orders WHERE created_at > '2025-01-15 12:00:00';
++----+-------------+--------+------+----------------+--------+---------+--------+--------+-------------+
+| id | select_type | table  | type | possible_keys  | key    | key_len | ref    | rows   | Extra       |
++----+-------------+--------+------+----------------+--------+---------+--------+--------+-------------+
+| 1  | SIMPLE      | orders | ALL  | idx_created_at | <null> | <null>  | <null> | 993929 | Using where |
++----+-------------+--------+------+----------------+--------+---------+--------+--------+-------------+
+1 row in set
+Time: 0.008s
+MariaDB videx@127.0.0.1:ddw_test_src> EXPLAIN SELECT * FROM orders ORDER BY created_at DESC LIMIT 100;
++----+-------------+--------+-------+---------------+----------------+---------+--------+------+-------+
+| id | select_type | table  | type  | possible_keys | key            | key_len | ref    | rows | Extra |
++----+-------------+--------+-------+---------------+----------------+---------+--------+------+-------+
+| 1  | SIMPLE      | orders | index | <null>        | idx_created_at | 5       | <null> | 100  |       |
++----+-------------+--------+-------+---------------+----------------+---------+--------+------+-------+
+1 row in set
+Time: 0.007s
+MariaDB videx@127.0.0.1:ddw_test_src> EXPLAIN SELECT * FROM orders WHERE status = 'Delivered';
++----+-------------+--------+------+---------------+--------+---------+--------+--------+-------------+
+| id | select_type | table  | type | possible_keys | key    | key_len | ref    | rows   | Extra       |
++----+-------------+--------+------+---------------+--------+---------+--------+--------+-------------+
+| 1  | SIMPLE      | orders | ALL  | idx_status    | <null> | <null>  | <null> | 993929 | Using where |
++----+-------------+--------+------+---------------+--------+---------+--------+--------+-------------+
+1 row in set
+Time: 0.010s
+MariaDB videx@127.0.0.1:ddw_test_src> EXPLAIN SELECT * FROM users WHERE gender = 'Female';
++----+-------------+-------+------+---------------+--------+---------+--------+--------+-------------+
+| id | select_type | table | type | possible_keys | key    | key_len | ref    | rows   | Extra       |
++----+-------------+-------+------+---------------+--------+---------+--------+--------+-------------+
+| 1  | SIMPLE      | users | ALL  | <null>        | <null> | <null>  | <null> | 741557 | Using where |
++----+-------------+-------+------+---------------+--------+---------+--------+--------+-------------+
+1 row in set
+Time: 0.006s
+MariaDB videx@127.0.0.1:ddw_test_src> EXPLAIN SELECT * FROM products WHERE status IN ('Active', 'Draft');
++----+-------------+----------+------+---------------+--------+---------+--------+--------+-------------+
+| id | select_type | table    | type | possible_keys | key    | key_len | ref    | rows   | Extra       |
++----+-------------+----------+------+---------------+--------+---------+--------+--------+-------------+
+| 1  | SIMPLE      | products | ALL  | idx_status    | <null> | <null>  | <null> | 495030 | Using where |
++----+-------------+----------+------+---------------+--------+---------+--------+--------+-------------+
+1 row in set
+Time: 0.008s
+MariaDB videx@127.0.0.1:ddw_test_src> EXPLAIN SELECT status, payment_status, COUNT(*) AS order_count, SUM(total_amount) AS total
+                                   -> FROM orders
+                                   -> GROUP BY status, payment_status;
++----+-------------+--------+------+---------------+--------+---------+--------+--------+---------------------------------+
+| id | select_type | table  | type | possible_keys | key    | key_len | ref    | rows   | Extra                           |
++----+-------------+--------+------+---------------+--------+---------+--------+--------+---------------------------------+
+| 1  | SIMPLE      | orders | ALL  | <null>        | <null> | <null>  | <null> | 993929 | Using temporary; Using filesort |
++----+-------------+--------+------+---------------+--------+---------+--------+--------+---------------------------------+
+1 row in set
+Time: 0.007s
+MariaDB videx@127.0.0.1:ddw_test_src> EXPLAIN SELECT o.order_number, u.username, o.created_at
+                                   -> FROM orders o
+                                   -> INNER JOIN users u ON o.user_id = u.user_id
+                                   -> WHERE o.created_at >= '2025-01-01'
+                                   -> AND u.status = 'Active'
+                                   -> ORDER BY o.created_at DESC;
++----+-------------+-------+--------+----------------------------+---------+---------+------------------------+--------+-----------------------------+
+| id | select_type | table | type   | possible_keys              | key     | key_len | ref                    | rows   | Extra                       |
++----+-------------+-------+--------+----------------------------+---------+---------+------------------------+--------+-----------------------------+
+| 1  | SIMPLE      | o     | ALL    | idx_user_id,idx_created_at | <null>  | <null>  | <null>                 | 993929 | Using where; Using filesort |
+| 1  | SIMPLE      | u     | eq_ref | PRIMARY,idx_status         | PRIMARY | 4       | ddw_test_src.o.user_id | 1      | Using where                 |
++----+-------------+-------+--------+----------------------------+---------+---------+------------------------+--------+-----------------------------+
+2 rows in set
+Time: 0.007s
+MariaDB videx@127.0.0.1:ddw_test_src> EXPLAIN SELECT title, created_at FROM product_reviews WHERE title in ('Great product!', 'Love it', 'Awesome') AND created_at >= '2024-01-01';
++----+-------------+-----------------+------+----------------+--------+---------+--------+--------+-------------+
+| id | select_type | table           | type | possible_keys  | key    | key_len | ref    | rows   | Extra       |
++----+-------------+-----------------+------+----------------+--------+---------+--------+--------+-------------+
+| 1  | SIMPLE      | product_reviews | ALL  | idx_created_at | <null> | <null>  | <null> | 795164 | Using where |
++----+-------------+-----------------+------+----------------+--------+---------+--------+--------+-------------+
+1 row in set
+Time: 0.005s
+MariaDB videx@127.0.0.1:ddw_test_src> CREATE INDEX idx_reviews_title_created_at ON product_reviews(title, created_at);
+Query OK, 0 rows affected
+Time: 0.743s
+MariaDB videx@127.0.0.1:ddw_test_src> EXPLAIN SELECT title, created_at FROM product_reviews WHERE title in ('Great product!', 'Love it', 'Awesome') AND created_at >= '2024-01-01';
++----+-------------+-----------------+-------+---------------------------------------------+------------------------------+---------+--------+--------+--------------------------+
+| id | select_type | table           | type  | possible_keys                               | key                          | key_len | ref    | rows   | Extra                    |
++----+-------------+-----------------+-------+---------------------------------------------+------------------------------+---------+--------+--------+--------------------------+
+| 1  | SIMPLE      | product_reviews | range | idx_created_at,idx_reviews_title_created_at | idx_reviews_title_created_at | 1028    | <null> | 333748 | Using where; Using index |
++----+-------------+-----------------+-------+---------------------------------------------+------------------------------+---------+--------+--------+--------------------------+
+1 row in set
+Time: 0.006s
